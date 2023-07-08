@@ -1,6 +1,6 @@
 # config
 *.env
-
+client
 # compiled output
 /dist
 /node_modules
