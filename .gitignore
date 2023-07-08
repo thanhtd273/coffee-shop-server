@@ -1,6 +1,9 @@
 # config
 *.env
 
+# some stuff file
+client/index.ts
+
 # compiled output
 /dist
 /node_modules

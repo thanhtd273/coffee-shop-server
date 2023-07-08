@@ -1,12 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-// import * as cacheUtil from './utils/cache';
+import { RedisIoAdapter } from './socket/socket.adapter';
+import helmet from 'helmet';
+import * as crurf from 'csurf';
+import * as xss from 'xss-clean';
+import * as mongoSanitize from 'express-mongo-sanitize';
+import * as hpp from 'hpp';
+
+// require('../client/index');
 require('./utils/cache');
+const port = process.env.PORT || 3000;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000, () => {
-    console.log(`App running on port 3000`);
+  const app = await NestFactory.create(AppModule, { cors: true });
+  const redisAdapter = new RedisIoAdapter(app);
+  await redisAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisAdapter);
+
+  app.use(helmet(), crurf());
+  app.use(xss());
+  app.use(mongoSanitize());
+  app.use(hpp({ whitelist: 'price' }));
+
+  await app.listen(port, () => {
+    console.log(`App running on port ${port}`);
   });
 }
 bootstrap();

@@ -45,3 +45,5 @@ mongoose.Query.prototype.exec = async function () {
     console.log(error);
   }
 };
+// console.log(process.env.DATABASE);
+// export const databseUrl = process.env.DATABASE;
