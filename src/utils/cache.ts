@@ -4,7 +4,6 @@ import { createClient } from 'redis';
 export interface CacheOption {
   key?: string;
 }
-
 const exec = mongoose.Query.prototype.exec;
 
 const client = createClient({
