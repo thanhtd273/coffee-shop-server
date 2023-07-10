@@ -22,7 +22,7 @@ import configuration from './config/configuration';
     SocketModule,
     ClientModule,
     ConfigModule.forRoot({
-      envFilePath: 'config.env',
+      envFilePath: '.env',
       load: [configuration],
     }),
     MongooseModule.forRootAsync({
