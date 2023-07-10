@@ -1,58 +1,32 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+import { RedisIoAdapter } from './socket/socket.adapter';
+// import helmet from 'helmet';
+// import * as crurf from 'csurf';
+// import * as xss from 'xss-clean';
+// import * as mongoSanitize from 'express-mongo-sanitize';
+// import * as hpp from 'hpp';
+
+// import './client';
 require('./utils/cache');
-
-import * as mongoose from 'mongoose';
-import { createClient } from 'redis';
-
-export interface CacheOption {
-  key?: string;
-}
-const exec = mongoose.Query.prototype.exec;
-
-const client = createClient({
-  url: process.env.CACHE_URL,
-});
-
-client.on('error', (err) => {
-  throw new Error('Cannot connect to Redis server!');
-});
-client.connect();
-
-mongoose.Query.prototype.cache = function () {
-  this.useCache = true;
-  return this;
-};
-
-mongoose.Query.prototype.exec = async function () {
-  if (!this.useCache) return exec.apply(this, arguments);
-  try {
-    const key = JSON.stringify(
-      Object.assign({}, this.getQuery(), {
-        collection: this.mongooseCollection.name,
-      }),
-    );
-
-    const cacheValue = await client.get(key);
-    if (cacheValue) {
-      const doc = JSON.parse(cacheValue);
-      return Array.isArray(doc)
-        ? doc.map((item: any) => this.model(item))
-        : this.model(doc);
-    }
-
-    const result = await exec.apply(this, arguments);
-    await client.set(key, JSON.stringify(result), { EX: 60 });
-    return result;
-  } catch (error) {
-    console.log(error);
-  }
-};
+const port = process.env.PORT || 3000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3000;
+  await app.listen(port, () => {
+    console.log(`App running on port ${port}`);
+  // app.enableCors
+  // const redisAdapter = new RedisIoAdapter(app);
+  // await redisAdapter.connectToRedis();
+  // app.useWebSocketAdapter(redisAdapter);
+
+  // app.use(helmet(), crurf());
+  // app.use(xss());
+  // app.use(mongoSanitize());
+  // app.use(hpp({ whitelist: 'price' }));
+
   await app.listen(port, () => {
     console.log(`App running on port ${port}`);
   });

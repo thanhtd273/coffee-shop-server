@@ -21,7 +21,6 @@ export class UsersController {
   @Get()
   async getAllUsers(@Res() res: Response): Promise<Response> {
     const users = await this.userService.getAllUsers();
-    console.log(users);
     return res.status(200).json({
       status: 'success',
       result: users.length,
@@ -55,7 +54,6 @@ export class UsersController {
         user,
       });
     } catch (error) {
-      console.log(error.code);
       throw new ForbiddenException(error, 'error message');
     }
   }

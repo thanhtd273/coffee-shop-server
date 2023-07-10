@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,7 +11,7 @@ import { UsersModule } from './users/users.module';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { AuthModule } from './auth/auth.module';
 import { SocketModule } from './socket/socket.module';
-import { SocketService } from './controller/socket/socket.service';
+import { ClientModule } from './client/client.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -18,17 +19,30 @@ import configuration from './config/configuration';
     UsersModule,
     ProductsModule,
     AuthModule,
-    ConfigModule.forRoot({ envFilePath: 'config.env', load: [configuration] }),
-    MongooseModule.forRoot(
-      'mongodb+srv://trinh-dinh-thanh:ceWMM6cEFXy2798p@app-cluster.uuvwytq.mongodb.net/coffee-shop?retryWrites=true&w=majority',
-    ),
     SocketModule,
+    ClientModule,
+    ConfigModule.forRoot({
+      envFilePath: 'config.env',
+      load: [configuration],
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const datbaseURL = configService
+          .get('DATABASE')
+          .replace('<PASSWORD>', configService.get('DATABASE_PASSWORD'));
+        return {
+          uri: datbaseURL,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    ThrottlerModule.forRoot({ ttl: 60, limit: 100 }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
-    SocketService,
   ],
 })
 export class AppModule {}

@@ -1,8 +1,19 @@
-import * as mongoose from 'mongoose';
+import mongoose, { Query, Document } from 'mongoose';
 import { createClient } from 'redis';
 
-export interface CacheOption {
-  key?: string;
+// export interface CacheOption {
+//   key?: string;
+// }
+declare module 'mongoose' {
+  interface Query<
+    ResultType,
+    DocType,
+    THelpers = {},
+    RawDocType = DocType,
+    QueryOp = 'find',
+  > {
+    cache(): Query<any, any, any, any>;
+  }
 }
 const exec = mongoose.Query.prototype.exec;
 
@@ -44,3 +55,5 @@ mongoose.Query.prototype.exec = async function () {
     console.log(error);
   }
 };
+// console.log(process.env.DATABASE);
+// export const databseUrl = process.env.DATABASE;
