@@ -34,6 +34,7 @@ export class ProductsService {
 
   async getProduct(id: string): Promise<Product> {
     const products = await this.productModel.findById(id).cache();
+
     return products;
   }
 
