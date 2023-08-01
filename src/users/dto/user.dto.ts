@@ -8,6 +8,7 @@ export class UserDto {
   readonly passwordConfirm?: string;
 
   readonly phone?: string;
+  readonly active?: boolean;
   readonly role?: string;
   readonly location?: typeof Map;
   readonly avatar?: string;

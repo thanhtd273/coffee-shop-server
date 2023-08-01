@@ -33,4 +33,37 @@ export class UsersService {
   async deleteUser(id: string) {
     await this.userModel.findByIdAndDelete(id);
   }
+
+  // private filterObj(obj: object, ...allowedFields: string[]) {
+  //   const newObj = {};
+  //   Object.keys(obj).forEach((item: string) => {
+  //     if (allowedFields.includes(item)) newObj[item] = obj[item];
+  //   });
+  //   return newObj;
+  // }
+
+  // async updateMe(id: string, infor: User): Promise<User> {
+  //   const allowanceFields = ['name', 'phone', 'location', 'avatar'];
+  //   const filtedBody = this.filterObj(infor, ...allowanceFields);
+
+  //   const updatedUser = await this.userModel.findByIdAndUpdate(id, filtedBody, {
+  //     runValidators: true,
+  //     new: true,
+  //   });
+
+  //   return updatedUser;
+  // }
+
+  // async deleteMe(id: string) {
+  //   await this.userModel.findByIdAndUpdate();
+  // }
+
+  async addToFavorite(id: string, product: string) {
+    const user = await this.userModel.findByIdAndUpdate(
+      id,
+      { $push: { favorites: product } },
+      { runValidators: true, new: true },
+    );
+    return user.favorites;
+  }
 }

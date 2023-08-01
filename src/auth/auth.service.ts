@@ -80,6 +80,7 @@ export class AuthService {
         throw new NotFoundException(
           'The user belongs to this token does no longer exists!',
         );
+      return freshUser;
     } catch (error) {
       next(new UnauthorizedException(error));
     }

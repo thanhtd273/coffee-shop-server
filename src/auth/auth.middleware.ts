@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response, request } from 'express';
 
 import { AuthService } from './auth.service';
 
@@ -9,7 +9,6 @@ export class AuthMiddleware implements NestMiddleware {
     private readonly authService: AuthService, // @InjectModel('User') private readonly userModel: Model<User>,
   ) {}
   async use(req: Request, res: Response, next: NextFunction) {
-    // try {
     let token = '';
     if (
       req.headers.authorization &&
@@ -17,7 +16,9 @@ export class AuthMiddleware implements NestMiddleware {
     )
       token = req.headers.authorization.split(' ')[1];
 
-    this.authService.protect(token, next);
+    const user = await this.authService.protect(token, next);
+    const request: any = <any>req;
+    request.user = user;
     next();
   }
 }

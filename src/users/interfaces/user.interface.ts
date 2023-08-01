@@ -8,6 +8,7 @@ export interface User {
   passwordConfirm?: string;
   phone?: string;
   role?: string;
+  active?: boolean;
   location?: typeof Map;
   avatar?: string;
   createdAt?: Date;

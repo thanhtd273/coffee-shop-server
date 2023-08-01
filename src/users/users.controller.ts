@@ -9,10 +9,13 @@ import {
   Delete,
   ForbiddenException,
   BadRequestException,
+  NotFoundException,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { UserDto } from './dto/user.dto';
+import { ProductDto } from 'src/products/dto/product.dto';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -78,6 +81,23 @@ export class UsersController {
       });
     }
   }
+  // @Patch('updateProfile')
+  // @Patch(':id')
+  // async updateMe(
+  //   @Param('id') id: string,
+  //   @Body() userData: UserDto,
+  //   @Res() res: Response,
+  // ): Promise<Response> {
+  //   try {
+  //     console.log('hello');
+  //     const user = await this.userService.updateMe(id, userData);
+  //     return res.status(200).json({
+  //       status: 'sucess',
+  //     });
+  //   } catch (err) {
+  //     throw new NotFoundException(err);
+  //   }
+  // }
 
   @Delete(':id')
   async deleteUser(
@@ -89,6 +109,20 @@ export class UsersController {
     return res.json({
       status: 'success',
       user: null,
+    });
+  }
+
+  @Patch(':id')
+  async addToFavorite(
+    @Param('id') id: string,
+    @Body() data: ProductDto,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const favorites = await this.userService.addToFavorite(id, data.name);
+
+    return res.status(200).json({
+      status: 'success',
+      favorites,
     });
   }
 }

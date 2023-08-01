@@ -6,6 +6,7 @@ import * as crypto from 'crypto';
 import OrderSchema from './order.schema';
 import NotificationSchema from './notification.schema';
 import { NextFunction } from 'express';
+import { Model, Schema } from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -58,6 +59,11 @@ const UserSchema = new mongoose.Schema({
   location: {
     type: Map,
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
   avatar: {
     type: String,
     default: '',
@@ -90,6 +96,14 @@ UserSchema.pre('save', async function (next: NextFunction) {
   this.passwordConfirm = undefined;
   next();
 });
+
+UserSchema.pre<Model<any, any, any, any, any>>(
+  /^find/,
+  function (next: NextFunction) {
+    this.find({ active: { $ne: false } });
+    next();
+  },
+);
 
 UserSchema.methods.correctPassword = async function (
   candidatePassword: string,
